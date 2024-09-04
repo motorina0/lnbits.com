@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>
+    LNbits | Free Open Source Bitcoin Lightning Wallet Accounts System
+  </title>
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="LNbits - Free Open Source Bitcoin Lightning Wallet Accounts System" />
+  <meta name="description" content="LNbits - Free Open Source Bitcoin Lightning Wallet Accounts System" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lnbits.com" />
+  <meta property="og:title" content="LNbits - Free Open Source Bitcoin Lightning Wallet Accounts System" />
+  <meta property="og:description" content="LNbits - Free Open Source Bitcoin Lightning Wallet Accounts System" />
+  <meta property="og:image" content="https://i.imgur.com/mhO1Cwn.png" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://lnbits.com" />
+  <meta property="twitter:title" content="LNBits - Free Open Source Bitcoin Lightning Wallet Accounts System" />
+  <meta property="twitter:description" content="LNBits - Free Open Source Bitcoin Lightning Wallet Accounts System" />
+  <meta property="twitter:image" content="https://i.imgur.com/mhO1Cwn.png" />
+
+  <!--====== Favicon Icon ======-->
+  <link rel="shortcut icon" href="assets/images/favicon.ico" type="image/svg" />
+
+  <!-- ===== All CSS files ===== -->
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="assets/css/animate.css" />
+  <link rel="stylesheet" href="assets/css/lineicons.css" />
+  <link rel="stylesheet" href="assets/css/materialicons.css" />
+  <link rel="stylesheet" href="assets/css/ud-styles.css" />
+  <link rel="stylesheet" href="assets/css/quasar.prod.css" />
+  <link rel="stylesheet" href="assets/css/lnbits.css" />
+  <style>
+    .q-card {
+      width: 350px;
+    }
+
+    .q-card p {
+      margin: 0;
+    }
+
+    .q-card h2 {
+      font-weight: bold;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    .navbar-btn .ud-main-btn {
+      padding: 3px 9px;
+      margin-left: 6px;
+    }
+
+    .ud-hero-buttons .ud-main-btn {
+      padding: 15px 25px !important;
+      text-transform: none !important;
+      font-size: 16px !important;
+    }
+
+    .navbar-btn .ud-main-btn {
+      padding: 2px 10px !important;
+      color: var(--white) !important;
+      text-transform: none !important;
+      font-size: 14px !important;
+      min-height: auto;
+    }
+
+    .navbar-btn .ud-white-btn:hover {
+      color: var(--heading-color) !important;
+    }
+
+    .navbar-btn .ud-main-btn .row {
+      margin: 0 !important;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .errors :last-child {
+      margin-bottom: 12px;
+    }
+
+    .q-dialog-plugin .row {
+      margin: 0;
+    }
+
+    .qrcode {
+      background: white;
+    }
+
+    .video-container {
+      width: 100%;
+      height: 0;
+      padding-bottom: 56.25%;
+      /* 16:9 aspect ratio */
+      position: relative;
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+      /* Ensure no borders */
+    }
+  </style>
+
+</head>
+
+<body class="body--dark">
+
+  <div id="q-app">
+
+    <q-dialog v-model="instanceDialog" position="top">
+      <q-card style="min-height: 200px" class="q-px-lg q-py-lg">
+        <h2 style="color: white;">Instance Control</h2>
+        <br />
+        <p style="color: white;"><label><b>Instance ID:</b></label> {{ active_instance.id }}</p>
+        <p style="color: white;"><label><b>Domain</b>:</label> {{ active_instance.domain }}</p>
+        <p style="color: white;"><label><b>Active</b>:</label> {{ active_instance.is_active }}</p>
+        <p style="color: white;"><label><b>Enabled</b>:</label> {{ active_instance.is_enabled }}</p>
+        <p style="color: white;"><label><b>Created at</b>:</label> {{ date(active_instance.timestamp) }}</p>
+        <p style="color: white;"><label><b>Stop date</b>:</label> {{ date(active_instance.timestamp_stop) }}</p>
+        <p style="color: white;"><q-img class="qrcode" style="width: 100%; height: auto;" :src="qrUrl()" alt="LNURLp" />
+        </p>
+        <p style="color: white;">
+          <q-btn color="deep-purple" @click="copyInvoice" label="Copy LNURL"></q-btn>
+          <q-btn color="deep-purple" flat @click="instanceDialog = false" label="Cancel"></q-btn>
+        </p>
+        <p v-if="active_instance.is_active" style="margin: 18px 0;">
+        <p v-if="active_instance.is_enabled && !active_instance.adminuser" style="text-align: center;">
+          <q-spinner-gears color="deep-purple" size="4em" style="margin: 20px auto" />
+          <q-tooltip :offset="[0, 8]">SaaS application is launching...</q-tooltip>
+        </p>
+        <q-btn v-if="active_instance.is_enabled && active_instance.adminuser" style="margin:0 4px 4px 0;"
+          color="success" @click="openAdminUrl()" label="Open Admin URL"></q-btn>
+        <q-btn v-if="active_instance.is_enabled && active_instance.adminuser" style="margin:0 4px 4px 0;"
+          color="success" @click="downloadBackup()" label="Download Backup"></q-btn>
+        <q-btn v-if="active_instance.is_enabled" style="margin:0 4px 4px 0;" color="warning"
+          @click="updateInstance('disable')" label="Disable"></q-btn>
+        <q-btn v-if="!active_instance.is_enabled && active_instance.timestamp_stop > new Date().getTime() / 1000"
+          style="margin:0 4px 4px 0;" color="success" @click="updateInstance('enable')" label="Enable"></q-btn>
+        <br />
+        <q-btn v-if="active_instance.timestamp_stop > new Date().getTime() / 1000" style="margin:0 4px 4px 0;"
+          color="danger" @click="updateInstance('reset')" label="Reset"></q-btn>
+        <span style="margin:12px 0; font-weight:bold;"
+          v-if="!active_instance.is_enabled && active_instance.timestamp_stop < new Date().getTime() / 1000">Instance
+          was stopped because you ran out of time. Pay the LNURL to start it again.</span>
+        <q-btn style="margin:0 4px 4px 0;" color="danger" @click="updateInstance('destroy')" label="Destroy"></q-btn>
+        </p>
+        <p>
+        </p>
+      </q-card>
+    </q-dialog>
+    <q-dialog v-model="loginDialogue" position="top">
+      <q-card style="min-height: 200px" class="q-px-lg q-py-lg">
+        <h2 style="color: white;">Login</h2>
+        <p style="color: white;"><b>DISCLAIMER: LNbits SaaS is in beta and should be used only for testing purposes.</b>
+        </p>
+        <q-card-section class="q-pt-none">
+          <div class="row">
+            <div class="col">
+              <q-input color="deep-purple" class="q-py-md" label="Email" type="email" style="max-width:240px;" dense
+                v-model="this.login_details.email" autofocus @keyup.enter="prompt = false"></q-input>
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <q-input color="deep-purple" class="q-py-md" label="Password" style="max-width:240px;" type="password"
+                dense v-model="this.login_details.password" autofocus @keyup.enter="prompt = false"></q-input>
+
+            </div>
+          </div>
+        </q-card-section>
+        <q-btn color="deep-purple" @click="login()" color="primary" label="Login"></q-btn>
+        or
+        <q-btn color="deep-purple" @click="signUpDialogue = true; loginDialogue = false" color="primary"
+          label="Sign Up"></q-btn>
+      </q-card>
+    </q-dialog>
+    <q-dialog v-model="signUpDialogue" position="top">
+      <q-card style="min-height: 200px" class="q-px-lg q-py-lg">
+        <h2 style="color: white;"> LNbits Saas</h2>
+        <p style="color: white;">After you have an account, you can launch a LNbits SaaS instance. It costs <b>21 sats.
+            When you pay the LNURLp link, your instance will get deployed and it takes about 1 minute to become
+            available. It will get disabled after your time runs out. You can extend your time or start it again by just
+            paying the Pay Link for that specific instance again. After 1 month of inactivity the instance will get
+            permanently deleted.</p>
+        <q-card-section class="q-pt-none">
+          <div class="row">
+            <div class="col">
+              <q-input color="deep-purple" class="q-py-md" label="Email" type="email" style="max-width:240px;" dense
+                v-model="this.signup_details.email" autofocus @keyup.enter="prompt = false"></q-input>
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <q-input color="deep-purple" class="q-py-md" label="Password" style="max-width:240px;" type="password"
+                dense v-model="this.signup_details.password" autofocus @keyup.enter="prompt = false"></q-input>
+
+            </div>
+          </div>
+          <div class="row">
+            <div class="col">
+              <q-input color="deep-purple" class="q-py-md" label="Repeat Password" style="max-width:240px;"
+                type="password" dense v-model="this.signup_details.password_repeat" autofocus
+                @keyup.enter="prompt = false"></q-input>
+
+            </div>
+          </div>
+        </q-card-section>
+        <p class="errors">
+          <span class="error" v-for="signupError in signupErrors">
+            <b>{{ signupError.loc[1] }}:</b> {{ signupError.msg }}
+          </span>
+        </p>
+        <q-btn color="deep-purple" flat label="Cancel" v-close-popup></q-btn>
+        <q-btn color="deep-purple" @click="signup()" color="primary" label="Sign Up"></q-btn>
+      </q-card>
+    </q-dialog>
+    <!-- ====== Header Start ====== -->
+    <header class="ud-header">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <nav class="navbar navbar-expand-lg">
+              <a class="navbar-brand" href="/">
+                <img src="assets/images/logo/logo.svg" style="width: 180px" alt="Logo" />
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu"
+                aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="toggler-icon"> </span>
+                <span class="toggler-icon"> </span>
+                <span class="toggler-icon"> </span>
+              </button>
+
+              <div class="navbar-collapse" id="mainMenu">
+                <ul id="nav" class="navbar-nav mx-auto">
+                  <li class="nav-item">
+                    <a class="ud-menu-scroll" href="#extensions">Extensions</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="ud-menu-scroll" href="#frameworks">Frameworks</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="ud-menu-scroll" href="#contact">Connect</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="https://demo.lnbits.com/tipjar/4">Support
+                      💕</a>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="navbar-btn d-none d-sm-inline-block">
+
+                <a href="https://my.lnbits.com" title="Launch an LNbits instance" class="ud-main-btn ud-white-btn"
+                  data-toggle="tooltip" data-placement="bottom" title="Launch LNbits"
+                  style="background-color: #FF1EE6; color: #1F2234">
+                  Launch
+                </a>
+
+                <a href="https://shop.lnbits.com" title="Visit the LNbits web store" class="ud-main-btn ud-white-btn"
+                  data-toggle="tooltip" data-placement="bottom" title="Shop">
+                  Store
+                  <i class="material-icons">storefront</i>
+                </a>
+
+                <a href="https://github.com/lnbits/lnbits#lnbits" class="ud-main-btn ud-white-btn"
+                  title="LNbits on Github">
+                  Github
+                </a>
+                <a href="https://demo.lnbits.com" rel="nofollow noopener" class="ud-main-btn ud-white-btn"
+                  data-toggle="tooltip" data-placement="bottom" title="Try the LNbits demo (For testing only)">
+                  Demo
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- ====== Header End ====== -->
+
+    <!-- ====== Hero Start ====== -->
+    <section class="ud-hero" id="home">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="ud-hero-content">
+              <h1 class="ud-hero-title" style="margin-bottom: 0px">
+
+                The world's most powerful suite of bitcoin tools.
+
+              </h1>
+              <p class="ud-hero-desc mb-1">
+                Run for yourself, for others, or as part of a
+                stack.
+              </p>
+
+              <div class="row ud-hero-buttons text-center">
+                <div class="col-12 mt-3">
+
+                  <a href="https://my.lnbits.com" title="Launch your own LNbits instance"
+                    class="ud-main-btn ud-white-btn" data-toggle="tooltip" data-placement="bottom" title="Launch LNbits"
+                    style="background-color: #FF1EE6; color: #1F2234">
+                    Launch
+                  </a>
+
+                  <a href="https://demo.lnbits.com" rel="nofollow noopener" class="ud-main-btn ud-white-btn q-ml-xs"
+                    data-toggle="tooltip" data-placement="bottom" title="Try the LNbits Demo server (For testing only)">
+                    Demo
+                  </a>
+
+
+                  <a href="https://extensions.lnbits.com" title="Checkout the extensions in LNbits"
+                    class="ud-main-btn ud-white-btn q-ml-xs" data-toggle="tooltip" data-placement="bottom"
+                    title="Extensions">
+                    Extensions
+                  </a>
+
+                  <a href="https://shop.lnbits.com" title="Visit the LNbits web store"
+                    class="ud-main-btn ud-white-btn q-ml-xs" data-toggle="tooltip" data-placement="bottom" title="Shop">
+                    Store
+                    <i class="material-icons">storefront</i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="container-pic">
+              <div class="ud-hero-image">
+                <div class="img-gradient">
+                  <img :src="slideimg" alt="hero-image">
+                  </img>
+                </div>
+                <div class="centered-pic">
+                  <q-btn round flat size="4.4em" style="color:rgb(255, 30, 230)" icon="play_arrow"
+                    @click="ytpopup = true"></q-btn>
+                </div>
+              </div>
+            </div>
+            <q-dialog v-model="ytpopup">
+              <q-card style="width: 90%; max-width: 80vw;" flat class="q-pa-none">
+                <q-card-section class="q-pa-none">
+                  <div class="video-container">
+
+
+                    <iframe
+                      :src="'https://www.youtube.com/embed/' + embedLink + '?autoplay=1&showinfo=0&rel=0&modestbranding=1'"
+                      title="YouTube video player" frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerpolicy="strict-origin-when-cross-origin" a allowfullscreen></iframe>
+                  </div>
+                </q-card-section>
+              </q-card>
+            </q-dialog>
+
+            <center>
+              <div class="row q-mt-xl gt-sm" style="width:80%">
+                <div class="col">
+                  <q-btn
+                    @mouseover="slideimg = 'assets/images/hero/bitcoin-accounts.png'; embedLink = 'b7Ou7XtqtRI?si=1JIjRveHfBBCvLZp'"
+                    outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
+                    <div class="row items-center no-wrap">
+                      <div class="text-center">
+                        User/Wallet System
+                        <br />
+                        <small>Fully responsive web wallet<br /></small>
+                      </div>
+
+                    </div>
+                  </q-btn>
+                </div>
+                <div class="col">
+                  <q-btn
+                    @mouseover="slideimg = 'assets/images/hero/bitcoin-extensions.png'; embedLink = 'ymq_BXN4lu0?si=4TThmpITE6SUhpMy'"
+                    outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
+                    <div class="row items-center no-wrap">
+                      <div class="text-center">
+                        40+ extensions
+                        <br />
+                        <small>extension framework<br /></small>
+                      </div>
+
+                    </div>
+                  </q-btn>
+                </div>
+                <div class="col">
+                  <q-btn
+                    @mouseover="slideimg = 'assets/images/hero/lnbits-node-management.png'; embedLink = 'LMs4bFrvy_Y?si=Zo-Wzz9X24W-bc4V'"
+                    outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
+                    <div class="row items-center no-wrap">
+                      <div class="text-center">
+                        ADMIN TOOLING
+                        <br />
+                        <small>For LNbits/node/users<br /></small>
+                      </div>
+
+                    </div>
+                  </q-btn>
+                </div>
+                <div class="col">
+                  <q-btn
+                    @mouseover="slideimg = 'assets/images/hero/lnbits-api-sdk.png'; embedLink = 'b1a5XshX5dA?si=0OWVn2gyyU1uj25T'"
+                    outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
+                    <div class="row items-center no-wrap">
+                      <div class="text-center">
+                        Supercharged API/SDK
+                        <br />
+                        <small>LNbits core and extensions<br /></small>
+                      </div>
+
+                    </div>
+                  </q-btn>
+                </div>
+
+              </div>
+            </center>
+          </div>
+        </div>
+      </div>
+
+    </section>
+    <!-- ====== Hero End ====== -->
+
+    <!-- ====== Features Start ====== -->
+    <section id="features" class="ud-features">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <h2 class="q-pb-lg">Access LNbits on all your devices.</h2>
+            <div class="row">
+              <div class="col-7  gt-sm" style="align-items: flex-end;display: flex;">
+                <div class="row" style="align-items: flex-end;">
+                  <div class="col-3 q-px-xs">
+                    <img src="./assets/images/hero/lnbits-extension.png"
+                      style="width:185px; box-shadow: 0 0 10px #483c49;">
+                  </div>
+                  <div class="col-7 q-px-xs">
+                    <img src="./assets/images/hero/lnbits-desktop.png" style="box-shadow: 0 0 10px #483c49;">
+                  </div>
+                  <div class="col-2 q-px-xs">
+                    <img src="./assets/images/hero/lnbits-app.png" style="width:95px; box-shadow: 0 0 10px #483c49;">
+                  </div>
+                </div>
+
+              </div>
+
+              <div class="col">
+                <h6 class="q-pb-lg">
+                  <br />LNbits core is a powerful wallet accounts system you can access on ALL your devices.
+                </h6>
+                <p>
+                  ✔️ Fully reactive and responsive web application
+                  <br />✔️ IOS and <a href="https://play.google.com/store/apps/details?id=com.lnbits.app#">Android</a>
+                  Apps (use with custom servers)
+                  <br />✔️ LNbits <a
+                    href="https://chromewebstore.google.com/detail/lnbits/fnldnnlngdcaeclobapjcdhdkoackcko">Chrome
+                    extension</a> for easy online payments
+                  <br />✔️ LNbits Desktop for advanced exporting and backup features
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ====== Features End ====== -->
+
+    <!-- ====== About Start ====== -->
+
+    <section id="extensions" class="ud-about">
+
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+
+            <div class="row">
+              <div class="col">
+                <h2 class="q-pb-lg" style="color: white;">LNbits extension universe.</h2>
+                <h6 class="q-pb-lg" style="color: white;">
+
+                  Extend YOUR LNbits to meet YOUR needs.
+                </h6>
+                <p style="color: white;">
+                  All non-core features are installed as extensions,
+                  reducing your code base and making your LNbits unique to you.
+                  <br />
+                  Extend your LNbits install in any direction, and even create and
+                  share your own extensions.
+                </p>
+              </div>
+              <div class="col gt-md">
+                <img src="./assets/images/hero/lnbits-extensions.png"
+                  style="box-shadow: 0 0 10px #B395B6;margin-top: 40px;">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ====== About End ====== -->
+
+    <!-- ====== Features Start ====== -->
+    <section id="features" class="ud-features">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <h2 class="q-pb-lg">Bootstrap your lightning payments.</h2>
+            <div class="row">
+              <div class="col gt-sm">
+                <img src="./assets/images/hero/bitcoin-funding-sources.png" style="opacity: 0.8;margin-top:20px">
+              </div>
+              <div class="col">
+                <h6 class="q-pb-lg">
+                  One API to rule them all.
+                  <br />Runs on ANY Lighting Network funding source
+                </h6>
+                <p>
+                  ✔️ Free and open-source
+                  <br />✔️ 4 years of real world use and hardening
+                  <br />✔️ Cutting edge, with new funding sources being added regularly.
+                  <br />✔️ NOSTR and LNURL native: create boltcards, nostr relays, sell NIP05s, vouchers, etc.
+                  <br />✔️ No more refactoring code for developers; changing your funding source is trivial.
+                  <br />✔️ Eyes on the code; huge user and developer community keeping LNbits updated.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ====== Features End ====== -->
+
+
+    <!-- ====== Pricing Start ====== -->
+    <section id="frameworks" class="ud-pricing">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <center>
+              <h2 class="q-pb-lg" style="color: white;">Frameworks used in LNbits.</h2>
+              <br />
+            </center>
+          </div>
+        </div>
+        <div class="q-pa-md example-row-stacked-to-horizontal">
+
+          <div class="row">
+            <div class="col-12 col-md-6 q-mb-md">
+              <q-card class="my-card"
+                style="width:100%;border: 2px solid rgb(255, 30, 230);background-color: rgba(13, 16, 23, 0.8);">
+                <q-card-section>
+                  <h5 style="color:rgb(255, 30, 230);">FRONTEND:</h5>
+                  <h3 style="color:rgb(255, 30, 230);">Quasar <small>(VueJS)</small></h3>
+                  <p style="color:rgb(255, 30, 230);">
+                    Front-end framework with VueJS components for high-performance,
+                    responsive websites, PWA, SSR, Mobile and Desktop apps,
+                  </p>
+                  <br />
+                  <a href="https://quasar.dev/" target="_blank">
+                    <img style="max-height:78px" src="assets/images/frameworks/quasar.png" alt="fastapi" />
+                  </a>
+                </q-card-section>
+              </q-card>
+            </div>
+            <div class="col-12 col-md-6 q-mb-md">
+              <q-card class="my-card"
+                style="width:100%;border: 2px solid rgb(255, 30, 230);background-color: rgba(13, 16, 23, 0.8);">
+                <q-card-section>
+                  <h5 style="color:rgb(255, 30, 230);">BACKEND:</h5>
+                  <h3 style="color:rgb(255, 30, 230);">FastAPI <small>(Python)</small></h3>
+                  <p style="color:rgb(255, 30, 230);">
+                    LNbits uses FastAPI, a modern, high-performance Python API framework, that's easy to build on.
+                  </p>
+                  <br />
+                  <a href="https://fastapi.tiangolo.com/" target="_blank">
+                    <img style="max-height:78px" src="assets/images/frameworks/fastapilogo.png" alt="fastapi" />
+                  </a>
+                </q-card-section>
+              </q-card>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- ====== Pricing End ====== -->
+
+    <!-- ====== FAQ Start ====== -->
+    <section id="connect" class="ud-faq">
+      <div class="shape">
+        <img src="assets/images/faq/shape.svg" alt="shape" />
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <div class="ud-section-title text-center mx-auto">
+              <h3>Getting started:</h3>
+
+            </div>
+            <center>
+              <h3>Checkout the <a href="https://github.com/lnbits/lnbits">GitHub</a> docs,
+                <a href="https://www.youtube.com/channel/UCGXU2Ae5x5K-5aKdmKqoLYg">YouTube</a> and <a
+                  href="https://github.com/cryptoteun/awesome-lnbits">Awesome LNbits</a>.
+              </h3>
+            </center>
+          </div>
+        </div>
+      </div>
+      <br />
+      <div class="row"
+        style="max-width: 1320px;padding-right: var(--bs-gutter-x,.75rem);padding-left: var(--bs-gutter-x,.75rem);margin-right: auto;margin-left: auto;">
+        <div class="col">
+
+          <div class="ud-info-meta">
+            <h5>LNbits Community</h5>
+            <p>LNbits has an incredible community of users and developers, exchanging ideas,
+              helping each other, and extending the free and open-source software. </p>
+            <br />
+            <p>Join the telegram group <a href="https://t.me/lnbits">t.me/lnbits</a></p>
+          </div>
+        </div>
+        <div class="col">
+
+          <div class="ud-info-meta">
+            <h5>lnbits.com</h5>
+            <p>This server is maintained by a few LNbits developers as an example demo of the software.</p>
+            <br />
+            <p>Email us directly <a href="mailto:lnbits@pm.me">lnbits@pm.me</a></p>
+          </div>
+        </div>
+      </div>
+
+  </div>
+
+  </section>
+  <!-- ====== FAQ End ====== -->
+
+  <!-- ====== Footer Start ====== -->
+  <footer class="ud-footer">
+    <div class="shape shape-1">
+      <img src="assets/images/footer/shape-1.png" alt="shape" />
+    </div>
+    <div class="shape shape-2">
+      <img src="assets/images/footer/shape-2.png" alt="shape" />
+    </div>
+    <div class="shape shape-3">
+      <img src="assets/images/footer/shape-3.png" alt="shape" />
+    </div>
+    <div class="ud-footer-widgets">
+      <div class="container">
+        <div class="row">
+          <div class="col-xl-5 col-lg-4 col-md-6">
+            <div class="ud-widget">
+              <a href="/" class="ud-footer-logo">
+                <img src="assets/images/logo/logo.svg" alt="logo" />
+              </a>
+              <p class="ud-widget-desc">
+                Free Open-Source Lightning Accounts System with Extensions.
+                Run for yourself, for others, or as part of a stack.
+                LNbits extension framework makes building easy.
+              </p>
+              <ul class="ud-widget-socials">
+
+                <li>
+                  <a href="https://twitter.com/lnbits">
+                    <i class="lni lni-twitter-filled"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+
+          <div class="col-xl-6 col-lg-6 col-md-8 col-sm-10">
+            <div class="ud-widget">
+              <h5 class="ud-widget-title">LNbits runs on:</h5>
+              <div class="col gt-md">
+                <img src="./assets/images/hero/lightning-funding-sources.png" style="opacity: 0.8;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ud-footer-bottom">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8">
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </footer>
+  <!-- ====== Footer End ====== -->
+  </div>
+
+  <!-- ====== Back To Top Start ====== -->
+  <a href="javascript:void(0)" class="back-to-top">
+    <i class="lni lni-chevron-up"> </i>
+  </a>
+  <!-- ====== Back To Top End ====== -->
+
+  <!-- ====== All Javascript Files ====== -->
+  <script src="assets/js/vue.global.prod.js"></script>
+  <script src="assets/js/quasar.umd.prod.js"></script>
+  <script src="assets/js/axios.min.js"></script>
+  <script src="assets/js/moment.min.js"></script>
+  <script src="assets/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/saas.js"></script>
+  <script>
+    // ==== for menu scroll
+    const pageLink = document.querySelectorAll(".ud-menu-scroll");
+
+    pageLink.forEach((elem) => {
+      elem.addEventListener("click", (e) => {
+        e.preventDefault();
+        document.querySelector(elem.getAttribute("href")).scrollIntoView({
+          behavior: "smooth",
+          offsetTop: 1 - 60,
+        });
+      });
+    });
+
+    // section menu active
+    function onScroll(event) {
+      const sections = document.querySelectorAll(".ud-menu-scroll");
+      const scrollPos =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop;
+
+      for (let i = 0; i < sections.length; i++) {
+        const currLink = sections[i];
+        const val = currLink.getAttribute("href");
+        const refElement = document.querySelector(val);
+        const scrollTopMinus = scrollPos + 73;
+        if (
+          refElement.offsetTop <= scrollTopMinus &&
+          refElement.offsetTop + refElement.offsetHeight > scrollTopMinus
+        ) {
+          document
+            .querySelector(".ud-menu-scroll")
+            .classList.remove("active");
+          currLink.classList.add("active");
+        } else {
+          currLink.classList.remove("active");
+        }
+      }
+    }
+
+    window.document.addEventListener("scroll", onScroll);
+  </script>
+</body>
+
+</html>
