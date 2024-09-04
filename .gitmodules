@@ -1,3 +1,0 @@
-[submodule "hardware-wallet"]
-	path = hardware-wallet
-	url = https://github.com/lnbits/hardware-wallet
