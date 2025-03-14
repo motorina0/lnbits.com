@@ -12,6 +12,8 @@ const app = Vue.createApp({
             slideimg: "assets/images/hero/bitcoin-accounts.png",
             ytpopup: false,
             embedLink: "b7Ou7XtqtRI",
+            vidtitle: "User/Wallet System",
+            vidtime: "(43 secs)",
             url: "https://api.lnbits.com",
             prompt: false,
             instanceDialog: false,

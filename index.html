@@ -316,30 +316,57 @@
 
               <div class="row ud-hero-buttons text-center">
                 <div class="col-12 mt-3">
-
-                  <a href="https://my.lnbits.com" title="Launch your own LNbits instance"
-                    class="ud-main-btn ud-white-btn" data-toggle="tooltip" data-placement="bottom" title="Launch LNbits"
-                    style="background-color: #FF1EE6; color: #1F2234">
-                    Launch
-                  </a>
-
-                  <a href="https://demo.lnbits.com" rel="nofollow noopener" class="ud-main-btn ud-white-btn q-ml-xs"
-                    data-toggle="tooltip" data-placement="bottom" title="Try the LNbits Demo server (For testing only)">
-                    Demo
-                  </a>
-
-
-                  <a href="https://extensions.lnbits.com" title="Checkout the extensions in LNbits"
-                    class="ud-main-btn ud-white-btn q-ml-xs" data-toggle="tooltip" data-placement="bottom"
-                    title="Extensions">
-                    Extensions
-                  </a>
-
-                  <a href="https://shop.lnbits.com" title="Visit the LNbits web store"
-                    class="ud-main-btn ud-white-btn q-ml-xs" data-toggle="tooltip" data-placement="bottom" title="Shop">
-                    Store
-                    <i class="material-icons">storefront</i>
-                  </a>
+                  <q-btn
+                  no-caps
+                    style="background-color: #FF1EE6" 
+                    text-color="black"
+                    type="a"
+                    href="https://my.lnbits.com"
+                    label="Launch"
+                    size="lg"
+                    :dense="$q.screen.lt.md"
+                  >
+                  <q-tooltip>Launch your own LNbits instance</q-tooltip>
+                </q-btn>
+                  <q-btn
+                  no-caps
+                    color="white"
+                    text-color="black"
+                    type="a"
+                    href="https://demo.lnbits.com"
+                    label="Demo"
+                    class="q-ml-md"
+                    size="lg"
+                    :dense="$q.screen.lt.md"
+                    >
+                    <q-tooltip>Try the LNbits Demo server (For testing only)</q-tooltip>
+                  </q-btn>
+                  <q-btn
+                  no-caps
+                  color="white"
+                  text-color="black"
+                  type="a"
+                  href="https://extensions.lnbits.com"
+                  label="Extensions"
+                  class="q-ml-md"
+                  size="lg"
+                  :dense="$q.screen.lt.md"
+                  >
+                  <q-tooltip>Checkout the extensions in LNbits</q-tooltip>
+                </q-btn>
+                <q-btn
+                no-caps
+                color="white"
+                text-color="black"
+                type="a"
+                href="https://shop.lnbits.com"
+                label="Store"
+                class="q-ml-md"
+                size="lg"
+                :dense="$q.screen.lt.md"
+                >
+                <q-tooltip>Visit the LNbits web store</q-tooltip>
+              </q-btn>
                 </div>
               </div>
             </div>
@@ -350,8 +377,13 @@
                   </img>
                 </div>
                 <div class="centered-pic">
-                  <q-btn round flat size="4.4em" style="color:rgb(255, 30, 230)" icon="play_arrow"
-                    @click="ytpopup = true"></q-btn>
+                    <q-btn no-caps @click="ytpopup = true" rounded style="background: #0D1017;border: 1px solid #FF1EE6;color:#FF1EE6;" >
+                      <div>
+                        <q-icon style="margin-bottom: -10px;" class="q-pr-sm" size="lg" name="play_arrow"></q-icon>
+                        <span v-text="vidtitle"></span>
+                        <br><small style="display: block; margin-top: -12px; text-align: left; padding-left: 45px;" v-text="vidtime"></small>
+                      </div>
+                    </q-btn>
                 </div>
               </div>
             </div>
@@ -359,8 +391,6 @@
               <q-card style="width: 90%; max-width: 80vw;" flat class="q-pa-none">
                 <q-card-section class="q-pa-none">
                   <div class="video-container">
-
-
                     <iframe
                       :src="'https://www.youtube.com/embed/' + embedLink + '?autoplay=1&showinfo=0&rel=0&modestbranding=1'"
                       title="YouTube video player" frameborder="0"
@@ -375,7 +405,7 @@
               <div class="row q-mt-xl gt-sm" style="width:80%">
                 <div class="col">
                   <q-btn
-                    @mouseover="slideimg = 'assets/images/hero/bitcoin-accounts.png'; embedLink = 'b7Ou7XtqtRI?si=1JIjRveHfBBCvLZp'"
+                    @mouseover="slideimg = 'assets/images/hero/bitcoin-accounts.png'; embedLink = 'b7Ou7XtqtRI?si=1JIjRveHfBBCvLZp'; vidtitle = 'User/Wallet System';  vidtime = '(43 secs)'"
                     outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
                     <div class="row items-center no-wrap">
                       <div class="text-center">
@@ -389,11 +419,11 @@
                 </div>
                 <div class="col">
                   <q-btn
-                    @mouseover="slideimg = 'assets/images/hero/bitcoin-extensions.png'; embedLink = 'ymq_BXN4lu0?si=4TThmpITE6SUhpMy'"
+                    @mouseover="slideimg = 'assets/images/hero/bitcoin-extensions.png'; embedLink = 'ymq_BXN4lu0?si=4TThmpITE6SUhpMy'; vidtitle = '50+ Extensions';  vidtime = '(38 secs)'"
                     outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
                     <div class="row items-center no-wrap">
                       <div class="text-center">
-                        40+ extensions
+                        50+ extensions
                         <br />
                         <small>extension framework<br /></small>
                       </div>
@@ -403,7 +433,7 @@
                 </div>
                 <div class="col">
                   <q-btn
-                    @mouseover="slideimg = 'assets/images/hero/lnbits-node-management.png'; embedLink = 'LMs4bFrvy_Y?si=Zo-Wzz9X24W-bc4V'"
+                    @mouseover="slideimg = 'assets/images/hero/lnbits-node-management.png'; embedLink = 'LMs4bFrvy_Y?si=Zo-Wzz9X24W-bc4V'; vidtitle = 'Admin Toolting';  vidtime = '(48 secs)'"
                     outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
                     <div class="row items-center no-wrap">
                       <div class="text-center">
@@ -417,7 +447,7 @@
                 </div>
                 <div class="col">
                   <q-btn
-                    @mouseover="slideimg = 'assets/images/hero/lnbits-api-sdk.png'; embedLink = 'b1a5XshX5dA?si=0OWVn2gyyU1uj25T'"
+                    @mouseover="slideimg = 'assets/images/hero/lnbits-api-sdk.png'; embedLink = 'b1a5XshX5dA?si=0OWVn2gyyU1uj25T'; vidtitle = 'Supercharged API/SDK';  vidtime = '(38 secs)'"
                     outline color="primary" style="height:110px;width:100%; background-color: #FF1EE6">
                     <div class="row items-center no-wrap">
                       <div class="text-center">
