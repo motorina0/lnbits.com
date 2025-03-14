@@ -130,13 +130,6 @@
               <a class="navbar-brand" href="/">
                 <img src="assets/images/logo/logo.svg" style="width: 180px" alt="Logo" />
               </a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainMenu"
-                aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="toggler-icon"> </span>
-                <span class="toggler-icon"> </span>
-                <span class="toggler-icon"> </span>
-              </button>
-
               <div class="navbar-collapse" id="mainMenu">
                 <ul id="nav" class="navbar-nav mx-auto">
                   <li class="nav-item">
@@ -158,16 +151,16 @@
                 </ul>
               </div>
 
-              <div class="navbar-btn d-none d-sm-inline-block">
+              <div float-right>
                 <q-btn
-                no-caps
+                  no-caps
                   style="background-color: #FF1EE6" 
                   text-color="black"
                   type="a"
                   href="https://my.lnbits.com"
                   label="Launch"
                   size="md"
-                  class="q-mr-xs"
+                  class="q-mr-xs gt-sm"
                 >
                 <q-tooltip>Launch your own LNbits instance</q-tooltip>
               </q-btn>
@@ -180,7 +173,7 @@
                 </div>
                 <q-tooltip>Checkout the repo</q-tooltip>
               </q-btn>
-              </div>
+            </div>
             </nav>
           </div>
         </div>
@@ -238,7 +231,7 @@
                   type="a"
                   href="https://extensions.lnbits.com"
                   label="Extensions"
-                  class="q-ml-sm"
+                  class="q-ml-sm gt-sm"
                   size="lg"
                   :dense="$q.screen.lt.md"
                   >
