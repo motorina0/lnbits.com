@@ -159,27 +159,27 @@
               </div>
 
               <div class="navbar-btn d-none d-sm-inline-block">
-
-                <a href="https://my.lnbits.com" title="Launch an LNbits instance" class="ud-main-btn ud-white-btn"
-                  data-toggle="tooltip" data-placement="bottom" title="Launch LNbits"
-                  style="background-color: #FF1EE6; color: #1F2234">
-                  Launch
-                </a>
-
-                <a href="https://shop.lnbits.com" title="Visit the LNbits web store" class="ud-main-btn ud-white-btn"
-                  data-toggle="tooltip" data-placement="bottom" title="Shop">
-                  Store
-                  <i class="material-icons">storefront</i>
-                </a>
-
-                <a href="https://github.com/lnbits/lnbits#lnbits" class="ud-main-btn ud-white-btn"
-                  title="LNbits on Github">
-                  Github
-                </a>
-                <a href="https://demo.lnbits.com" rel="nofollow noopener" class="ud-main-btn ud-white-btn"
-                  data-toggle="tooltip" data-placement="bottom" title="Try the LNbits demo (For testing only)">
-                  Demo
-                </a>
+                <q-btn
+                no-caps
+                  style="background-color: #FF1EE6" 
+                  text-color="black"
+                  type="a"
+                  href="https://my.lnbits.com"
+                  label="Launch"
+                  size="md"
+                  class="q-mr-xs"
+                >
+                <q-tooltip>Launch your own LNbits instance</q-tooltip>
+              </q-btn>
+              <q-btn no-caps type="a" href="https://github.com/lnbits/lnbits#lnbits" rounded outline color="teal" >
+                <div>
+                  <span>Github</span>
+                  <q-icon size="md">
+                    <img src="assets/images/github.png" style="width: 24px; height: 24px;">
+                  </q-icon>
+                </div>
+                <q-tooltip>Checkout the repo</q-tooltip>
+              </q-btn>
               </div>
             </nav>
           </div>
