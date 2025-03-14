@@ -285,4 +285,6 @@ app.use(Quasar, {
         dark: true
     }
 })
+
+
 app.mount('#q-app')
